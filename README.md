@@ -7,6 +7,8 @@ TourGuide is a Spring Boot application that has been a centerpiece in TripMaster
 ## Modules complémentaires
 - [Module Rewards](https://github.com/gwnll/ms_rewards)
 - [Module GPS](https://github.com/gwnll/ms_gps)
+## Architectural Diagram
+![alt text](https://github.com/gwnll/ms_user/blob/main/diagramme_architecture.png?raw=true)
 ## Technologies
 - Java
 - Gradle
