@@ -12,6 +12,7 @@ TourGuide is a Spring Boot application that has been a centerpiece in TripMaster
 - Gradle
 - Spring 
 - Docker
+> You can use ``docker-compose up -d`` to deploy all TourGuide microservices
 ## Endpoints
 #### POST http://localhost:80/addUser
 > add user to internalUserMap for testing
