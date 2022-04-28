@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  ms_user:
+    depends_on:
+      - ms_rewards
+      - ms_gps
+    image: ms_user
+    container_name: ms_user
+    ports:
+      - 80:8080
+    restart: always
+
+  ms_rewards:
+    depends_on:
+      - ms_gps
+    image: ms_rewards
+    container_name: ms_rewards
+    ports:
+      - 81:8081
+    restart: always
+
+  ms_gps:
+    image: ms_gps
+    container_name: ms_gps
+    ports:
+      - 82:8082
+    restart: always
