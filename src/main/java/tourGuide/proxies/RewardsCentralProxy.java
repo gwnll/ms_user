@@ -2,10 +2,11 @@ package tourGuide.proxies;
 
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import tourGuide.user.User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import tourGuide.user.UserReward;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public interface RewardsCentralProxy {
 
     @PostMapping("/calculateRewards")
-    public void calculateRewards(@RequestBody User user);
+    public List<UserReward> calculateRewards(@RequestBody CalculateRewardsRequest request);
 
     @GetMapping("/getRewardPoints")
     public int getRewardPoints(@RequestParam String attractionId, @RequestParam String userId);

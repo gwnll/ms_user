@@ -25,5 +25,7 @@ public interface GpsUtilProxy {
 
     @GetMapping("/near")
     public boolean near(@RequestParam double lat1, @RequestParam double long1,
-                        @RequestParam double lat2, @RequestParam double long2);
+                        @RequestParam double lat2, @RequestParam double long2,
+                        @RequestParam int proximityBuffer);
+
 }
