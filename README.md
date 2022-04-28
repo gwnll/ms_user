@@ -13,23 +13,23 @@ TourGuide is a Spring Boot application that has been a centerpiece in TripMaster
 - Spring 
 - Docker
 ## Endpoints
-#### POST/addUser
+#### POST http://localhost:80/addUser
 > add user to internalUserMap for testing
 > ``@RequestBody User``
-#### POST /setUserPreferences
+#### POST http://localhost:80/setUserPreferences
 >  ``@RequestBody UserPreferences userPreferences, @RequestParam String userName``
-#### GET /getUserPreferences
+#### GET http://localhost:80/getUserPreferences
 > ``@RequestParam String userName``
-#### GET /getAllUsers
+#### GET http://localhost:80/getAllUsers
 > No parameter needed
-#### GET /getTripDeals
+#### GET http://localhost:80/getTripDeals
 > ``@RequestParam String userName``
-#### GET /getLocation
+#### GET http://localhost:80/getLocation
 > ``@RequestParam String userName``
-#### GET /getRewards
+#### GET http://localhost:80/getRewards
 > ``@RequestParam String userName``
-#### GET /getNearbyAttractions
+#### GET http://localhost:80/getNearbyAttractions
 > get the 5 nearest attractions depending on user's current location
 > ``@RequestParam String userName``
-#### GET /getAllCurrentLocations
+#### GET http://localhost:80/getAllCurrentLocations
 > get all current locations from all users
