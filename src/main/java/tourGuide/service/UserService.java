@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.dto.*;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.proxies.CalculateRewardsRequest;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.proxies.RewardsCentralProxy;
 import tourGuide.tracker.Tracker;
@@ -16,6 +17,9 @@ import tripPricer.TripPricer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,12 +32,13 @@ public class UserService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
+    private ExecutorService executor = Executors.newFixedThreadPool(1000);
 
     public UserService(GpsUtilProxy gpsUtilProxy, RewardsCentralProxy rewardsCentralProxy) {
         this.gpsUtilProxy = gpsUtilProxy;
         this.rewardsCentralProxy = rewardsCentralProxy;
 
-        if(testMode) {
+        if (testMode) {
             logger.info("TestMode enabled");
             logger.debug("Initializing users");
             initializeInternalUsers();
@@ -43,15 +48,16 @@ public class UserService {
         addShutDownHook();
     }
 
+    // proximity in miles
+    private int defaultProximityBuffer = 10;
+    private int proximityBuffer = defaultProximityBuffer;
+
     public List<UserReward> getUserRewards(User user) {
         return user.getUserRewards();
     }
 
     public VisitedLocation getUserLocation(User user) {
-        VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
-                user.getLastVisitedLocation() :
-                trackUserLocation(user);
-        return visitedLocation;
+        return user.getVisitedLocations().stream().findFirst().orElse(null);
     }
 
     public User getUser(String userName) {
@@ -63,7 +69,7 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        if(!internalUserMap.containsKey(user.getUserName())) {
+        if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
         }
     }
@@ -76,11 +82,44 @@ public class UserService {
         return providers;
     }
 
-    public VisitedLocation trackUserLocation(User user) {
-        VisitedLocation visitedLocation = getUserLocation(user);
+    public void trackUserLocation(User user) {
+        CompletableFuture.supplyAsync(() -> {
+            return gpsUtilProxy.getVisitedLocation(user.getUserId().toString());
+        }, executor)
+                .thenAccept(visitedLocation -> {
+                    registerUserLocation(user, visitedLocation);
+                });
+    }
+
+
+    public void registerUserLocation(User user, VisitedLocation visitedLocation) {
         user.addToVisitedLocations(visitedLocation);
-        rewardsCentralProxy.calculateRewards(user);
-        return visitedLocation;
+        calculateRewards(user);
+    }
+
+    public void calculateRewards(User user) {
+        List<VisitedLocation> userLocations = user.getVisitedLocations();
+        CompletableFuture.supplyAsync(() -> {
+            List<Attraction> attractions = gpsUtilProxy.getAttractions().stream()
+                    .filter(a -> user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(a.attractionName)))
+                    .collect(Collectors.toList());
+            return rewardsCentralProxy.calculateRewards(new CalculateRewardsRequest(user.getUserId(), userLocations, attractions));
+        }, executor)
+                .thenAccept(rewards -> {
+                    rewards.forEach(user::addUserReward);
+                });
+    }
+
+    public void calculateRewards(User user, int proximityBuffer) {
+        List<VisitedLocation> userLocations = user.getVisitedLocations();
+        CompletableFuture.supplyAsync(() -> {
+            return gpsUtilProxy.getAttractions().stream()
+                    .filter(a -> user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(a.attractionName)))
+                    .collect(Collectors.toList());
+        }, executor)
+                .thenAccept(attractions -> {
+                    rewardsCentralProxy.calculateRewards(new CalculateRewardsRequest(user.getUserId(), proximityBuffer, userLocations, attractions)).forEach(user::addUserReward);
+                });
     }
 
     public List<NearbyAttraction> getNearByAttractions(VisitedLocation visitedLocation, User user) {
@@ -127,6 +166,7 @@ public class UserService {
     private static final String tripPricerApiKey = "test-server-api-key";
     // Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
     private final Map<String, User> internalUserMap = new HashMap<>();
+
     private void initializeInternalUsers() {
         IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
             String userName = "internalUser" + i;
@@ -141,7 +181,7 @@ public class UserService {
     }
 
     private void generateUserLocationHistory(User user) {
-        IntStream.range(0, 3).forEach(i-> {
+        IntStream.range(0, 3).forEach(i -> {
             user.addToVisitedLocations(new VisitedLocation(user.getUserId(), new Location(generateRandomLatitude(), generateRandomLongitude()), getRandomTime()));
         });
     }
