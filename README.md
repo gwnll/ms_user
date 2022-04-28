@@ -12,3 +12,24 @@ TourGuide is a Spring Boot application that has been a centerpiece in TripMaster
 - Gradle
 - Spring 
 - Docker
+## Endpoints
+#### POST/addUser
+> add user to internalUserMap for testing
+> ``@RequestBody User``
+#### POST /setUserPreferences
+>  ``@RequestBody UserPreferences userPreferences, @RequestParam String userName``
+#### GET /getUserPreferences
+> ``@RequestParam String userName``
+#### GET /getAllUsers
+> No parameter needed
+#### GET /getTripDeals
+> ``@RequestParam String userName``
+#### GET /getLocation
+> ``@RequestParam String userName``
+#### GET /getRewards
+> ``@RequestParam String userName``
+#### GET /getNearbyAttractions
+> get the 5 nearest attractions depending on user's current location
+> ``@RequestParam String userName``
+#### GET /getAllCurrentLocations
+> get all current locations from all users
