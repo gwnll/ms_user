@@ -1,21 +1,21 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) 
 
 # TourGuide
-
 TourGuide is a Spring Boot application that has been a centerpiece in TripMasters app portfolio. It allows users to see tourist attractions and to get package deals on hotel stays and admission to various attractions.
 ***
-## Modules complémentaires
+## ms_user
+### Modules complémentaires
 - [Module Rewards](https://github.com/gwnll/ms_rewards)
 - [Module GPS](https://github.com/gwnll/ms_gps)
-## Architectural Diagram
+### Architectural Diagram
 ![alt text](https://github.com/gwnll/ms_user/blob/main/diagramme_architecture.png?raw=true)
-## Technologies
+### Technologies
 - Java
 - Gradle
 - Spring 
 - Docker
 > You can use ``docker-compose up -d`` to deploy all TourGuide microservices
-## Endpoints
+### Endpoints
 #### POST http://localhost:80/addUser
 > add user to internalUserMap for testing
 > ``@RequestBody User``
