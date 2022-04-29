@@ -13,8 +13,6 @@ import tripPricer.Provider;
 
 import java.util.List;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 @RestController
 public class TourGuideController {
 

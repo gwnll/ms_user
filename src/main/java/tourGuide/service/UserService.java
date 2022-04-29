@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.dto.*;
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.proxies.CalculateRewardsRequest;
+import tourGuide.request.CalculateRewardsRequest;
 import tourGuide.proxies.GpsUtilProxy;
 import tourGuide.proxies.RewardsCentralProxy;
 import tourGuide.tracker.Tracker;
